@@ -28,3 +28,6 @@ class ScheduleRequest(RunRequest):
     recipient: str = Field(min_length=1, max_length=100)
     first_at: datetime
     repeat_daily: bool = False
+
+class AckRequest(Request):
+    fingerprint: str = Field(min_length=8, max_length=64)

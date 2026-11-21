@@ -11,6 +11,7 @@ from src.models.identity import User
 from src.models.jobs import Run
 from src.models.source import Dataset
 from src.schemas.requests import ReviewRequest, RunRequest
+from src.services import dispatch
 from src.services.audit import record
 from src.services.validation import normalize_params
 from src.utils import views
@@ -76,5 +77,7 @@ def review(run_id: int, body: ReviewRequest, db: Session = Depends(connection),
         raise ValueError('请选择项目支持的处置决定')
     item.review, item.review_note, item.decision = body.review, body.note, body.decision or None
     record(db, actor.username, f'review.{item.review}', item.id, note=body.note, decision=item.decision)
+    if item.review == Review.ACCEPTED:
+        dispatch.sign_version(db, item, actor.username)
     db.commit()
     return views.run(item, detail=True)

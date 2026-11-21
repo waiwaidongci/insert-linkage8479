@@ -15,3 +15,11 @@ class Review(StrEnum):
     PENDING = 'pending'
     ACCEPTED = 'accepted'
     RETURNED = 'returned'
+
+class PackState(StrEnum):
+    PENDING = 'pending'
+    ACKED = 'acked'
+
+class ShipState(StrEnum):
+    OPEN = 'open'
+    COMPLETE = 'complete'

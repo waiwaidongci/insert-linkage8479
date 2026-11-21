@@ -1,3 +1,4 @@
+from src.constants.enums import PackState
 from src.utils.time import iso
 
 
@@ -27,3 +28,25 @@ def schedule(item):
 def delivery(item):
     return {'id': item.id, 'run_id': item.run_id, 'recipient': item.recipient,
             'state': item.state, 'detail': item.detail, 'created_at': iso(item.created_at)}
+
+
+def list_version(item):
+    return {'version': item.version, 'run_id': item.run_id, 'entry_count': item.entry_count,
+            'fingerprint': item.fingerprint, 'author': item.author, 'created_at': iso(item.created_at)}
+
+
+def package(item):
+    return {'seq': item.seq, 'state': item.state, 'item_count': item.item_count,
+            'fingerprint': item.fingerprint, 'summary': item.summary,
+            'receipt': item.receipt, 'acked_by': item.acked_by, 'acked_at': iso(item.acked_at)}
+
+
+def shipment(item, packages):
+    summary = {'added': 0, 'removed': 0, 'changed': 0}
+    for pack in packages:
+        for op, count in pack['summary'].items():
+            summary[op] += count
+    return {'id': item.id, 'from_version': item.from_version, 'to_version': item.to_version,
+            'state': item.state, 'package_count': item.package_count,
+            'acked': sum(1 for pack in packages if pack['state'] == PackState.ACKED),
+            'summary': summary, 'created_at': iso(item.created_at), 'completed_at': iso(item.completed_at)}

@@ -5,6 +5,7 @@ from src.constants.enums import Role
 from src.domain.demo import demo_rows
 from src.domain.spec import SPEC
 from src.models.identity import User
+from src.models.procure import SiteState
 from src.models.source import Dataset
 from src.services.datasets import save
 from src.utils.security import hash_password
@@ -15,6 +16,9 @@ def seed():
         for role in Role:
             if not db.get(User, role.value):
                 db.add(User(username=role.value, role=role, password_hash=hash_password(f'{role.value}-demo-2611')))
+        for site in SPEC['sites']:
+            if not db.get(SiteState, site):
+                db.add(SiteState(site=site, baseline=0))
         item, created = save(db, SPEC['default_dataset'], SPEC['sample_name'], demo_rows(), 'seed')
         return {'users': db.scalar(select(func.count()).select_from(User)),
                 'datasets': db.scalar(select(func.count()).select_from(Dataset)),
